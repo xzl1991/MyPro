@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.CleanDao">
+	
+	<delete id="deleteOldEcode" >
+		delete from ecode where status=2
+	</delete>
+	<delete id="deleteOldCrowdCode" >
+		delete  from crowdcode  where crowdid=3 and status=2;
+	</delete>
+
+</mapper>

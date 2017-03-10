@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-3.2.xsd
+						http://www.springframework.org/schema/jee 
+						http://www.springframework.org/schema/jee/spring-jee-3.2.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+						http://www.springframework.org/schema/tx 
+						http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop-3.2.xsd"
+	default-lazy-init="true" default-autowire="byName">
+	
+   	<context:property-placeholder location="classpath:redis.properties" />  
+	<context:component-scan base-package="com.huoli.bmall.client.controller" />
+	<context:component-scan base-package="com.huoli.bmall.points.service" />
+	<context:component-scan base-package="com.huoli.bmall.adapter.service" />
+
+	<mvc:annotation-driven />
+	
+	<!-- 默认试图解析 -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" 
+			value="/WEB-INF/page/"/>
+		<property name="suffix"
+			value=".jsp"/>
+	</bean> 
+	
+	<!-- redis  -->  
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">  
+        <property name="maxIdle" value="${redis.maxIdle}" />  
+        <property name="maxActive" value="${redis.maxActive}" />  
+        <property name="maxWait" value="${redis.maxWait}" />  
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" />  
+    </bean>  
+       
+    <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"  
+        p:host-name="${redis.host}" p:port="${redis.port}" p:password="${redis.pass}"  p:pool-config-ref="poolConfig"/>  
+      
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">  
+        <property name="connectionFactory"   ref="connectionFactory" />  
+    </bean>      
+	
+
+	
+	<!-- 持久层 -->
+	<!-- mybatis配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	 	<property name="dataSource"	ref="ds">
+	 	</property>
+	 	<property name="mapperLocations" value="classpath:dao/*.xml">
+	 	</property>
+	 </bean>
+	 
+	<!-- mybatis相关，自动建立映射关系 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	 	<property name="basePackage" 
+	 		value="com.huoli.bmall.activity.dao;com.huoli.bmall.points.dao;com.huoli.bmall.adapter.dao">
+	 	</property>
+	</bean>	
+
+	<!-- 定义受环境影响易变的变量 -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="false" />
+		<property name="locations">
+			<list>
+				<!-- 标准配置 -->
+				<value>classpath:application.properties</value>
+				<!-- <value>file:${user.dir}/config/application.properties</value> -->
+			</list>
+		</property>
+	</bean>		
+	
+	<!-- 数据源配置,使用C3P0数据库连接池 -->
+	<bean id="ds"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<!-- 设置数据库连接参数  开发版
+		<property name="user" value="${bmall.username}"/>
+		<property name="password" value="${bmall.password}"/>
+		<property name="driverClass" value="${bmall.driver}"/>
+		<property name="jdbcUrl" value="${bmall.url}"/>-->
+		<!-- <property name="driverClass">
+			<value>${bmall.driver}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${bmall.url}</value>
+		</property>
+		<property name="user">
+			<value>${bmall.username}</value>
+		</property>
+		<property name="password">
+			<value>${bmall.password}</value>
+		</property> -->
+		
+		<!-- 设置数据库连接参数  仿真版        	
+		 
+        <property name="jdbcUrl" value="jdbc:mysql://182.92.159.18:3306/testmall?characterEncoding=utf-8"/>
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="user" value="stat"/>
+        <property name="password" value="123456"/>-->
+        
+		<!-- 设置数据库连接参数  正式版        -->			
+		
+        <!-- <property name="jdbcUrl" value="jdbc:mysql://182.92.159.18:3306/bmall?characterEncoding=utf-8"/> -->
+        <property name="jdbcUrl" value="jdbc:mysql://123.56.101.36:3306/testmall?characterEncoding=utf-8"/>
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="user" value="testmall"/>
+        <property name="password" value="wjsohot32602"/>
+
+		<!-- 设置连接池参数 -->
+		<property name="initialPoolSize" value="5"/>
+		<property name="maxPoolSize" value="30"/>
+		<property name="minPoolSize" value="1"/>
+		<property name="acquireIncrement" value="2"/>
+		<property name="maxIdleTime" value="60"/>
+	</bean>
+	
+	<!-- 启动触发器的配置开始 -->  
+    <bean name="startQuertz" lazy-init="false" autowire="no"  
+        class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+        <property name="triggers">  
+            <list>  
+                <ref bean="myJobTrigger" />  
+                <ref bean="giftJobTrigger" />  
+            </list>  
+        </property> 
+    </bean> 
+    <!-- 启动触发器的配置结束 -->  	
+    <!-- quartz-1.8的配置 -->   
+    <bean id="myJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerBean">  
+        <property name="jobDetail">  
+            <ref bean="myJobDetail" />  
+        </property>  
+        <property name="cronExpression">
+        	<value>0 0/2 * * * ? *</value>  
+        <!-- 
+        <value>1 0/15 * * * ? *</value>
+         -->
+        </property>  
+    </bean> 
+     <bean id="giftJobTrigger"  class="org.springframework.scheduling.quartz.CronTriggerBean">  
+        <property name="jobDetail">  
+            <ref bean="giftJobDetail" />  
+        </property>  
+        <property name="cronExpression">
+        	<value>0 0 0/1 * * ?</value>  
+        </property>  
+    </bean>   
+    
+    <!-- 调度的配置结束 -->  
+  
+    <!-- job的配置开始 -->  
+    <bean id="myJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <property name="targetObject">  
+            <ref bean="myJob" />  
+        </property>  
+        <property name="targetMethod">  
+            <value>checkOrder</value>  
+        </property>  
+    </bean>  
+     <bean id="giftJobDetail"  class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <property name="targetObject">  
+            <ref bean="checkGiftJob" />  
+        </property>  
+        <property name="targetMethod">  
+            <value>checkGift</value>  
+        </property>  
+    </bean> 
+    <!-- job的配置结束 -->  
+  
+    <!-- 工作的bean -->  
+    <bean id="myJob" class="com.huoli.bmall.task.checkOrderStatus" /> 
+    <bean id="checkGiftJob" class="com.huoli.bmall.task.CheckGiftJob" /> 
+	
+	<!-- 解决Ajax响应中文乱码 [SpringMVC使用@ResponseBody处理Ajax请求] -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+					<property name="supportedMediaTypes">
+						<list>
+							<value>text/plain;charset=UTF-8</value>
+							<value>text/html;charset=UTF-8</value>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="ds"></property>
+	</bean>	
+	
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+</beans> 

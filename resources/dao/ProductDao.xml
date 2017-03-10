@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.ProductDao">
+	<select id="allProduct"
+	parameterType="com.huoli.bmall.points.model.Product"
+	resultType="com.huoli.bmall.points.model.Product">
+	select * from (
+		select * from product a where a.status &lt; 50 union 
+		select * from hbproduct b where b.status &lt; 50 
+    )c order by IF(ISNULL(c.sort),1,0), c.sort, c.createtime desc, c.productid desc;
+	</select>
+	<select id="allGjProduct"
+	parameterType="com.huoli.bmall.points.model.Product"
+	resultType="com.huoli.bmall.points.model.Product">
+		select * from product where status &lt; 50  and LENGTH(appname) =6  order by IF(ISNULL(sort),1,0), sort, createtime desc, productid desc; 
+	</select>
+	<select id="getGroupProduct"
+	parameterType="java.lang.Integer"
+	resultType="com.huoli.bmall.points.model.Product">
+	select * from (
+		select g1.ngroupid,g1.`order`,p1.* from group_product g1 inner join 
+		product p1 on p1.productid=g1.productid and p1.status &lt; 50  and g1.status=1
+		union 
+		select g2.ngroupid,g2.`order`,p2.* from group_product g2 inner join 
+		hbproduct p2 on p2.productid=g2.productid and p2.status &lt; 50  and g2.status=1 ) t
+		order by t.order desc; 
+	</select>
+	
+	<select id="getGoodspecByProductId" parameterType="java.lang.Integer" resultType="com.huoli.bmall.points.model.goods.Goodspec">
+	 select * from goodspec  where productid=#{productid} and status=1 order by sort;
+	</select>
+	
+	<select id="getGroupByProductId" parameterType="java.lang.Integer" resultType="com.huoli.bmall.points.model.group.GroupProduct">
+	 select * from group_product  where productid=#{productid}
+	</select>
+	
+	<select id="getProductRecommends"
+	resultType="com.huoli.bmall.points.model.group.ProductRecommend">
+	 select * from ( 
+	  select t1.* from product_recommend t1 inner join product p1 on t1.productid=p1.productid and p1.status &lt; 50  
+	  union 
+	  select t2.* from product_recommend t2 inner join hbproduct p2 on t2.productid=p2.productid and p2.status &lt; 50 
+	) t
+	order by t.order desc; 
+	</select>
+	
+	<select id="getProductDetails"
+	resultType="com.huoli.bmall.points.model.group.GoodsDetail">
+	 select * from ( 
+	   select t1.* from product_detail t1 inner join product p1 on t1.productid=p1.productid and p1.status &lt; 50  
+       union 
+       select t2.* from product_detail t2 inner join hbproduct p2 on t2.productid=p2.productid and p2.status &lt; 50 
+	) t
+	order by t.order ; 
+	</select>
+	
+	<select id="getProductHint"
+	resultType="com.huoli.bmall.points.model.group.ProductHint">
+	 select * from ( 
+	   select t1.* from product_hint t1 inner join product p1 on t1.productid=p1.productid and p1.status &lt; 50 and t1.status=1   
+       union 
+       select t2.* from product_hint t2 inner join hbproduct p2 on t2.productid=p2.productid and p2.status &lt; 50 and t2.status=1   
+	) t
+	order by t.productid ; 
+	</select>
+	
+	<select id="allUnGroupedProduct"
+	parameterType="com.huoli.bmall.points.model.Product"
+	resultType="com.huoli.bmall.points.model.Product">
+		select * from product where status &lt; 50  and groupid=0 and (groupid is null or groupid=0) order by IF(ISNULL(sort),1,0), sort, createtime desc, productid desc; 
+	</select>
+	<select id="getShowTemplets"
+	resultType="com.huoli.bmall.points.model.ShowTemplet">
+		select * from showtemplet where status = 1 order by sort desc; 
+	</select>
+	<select id="getProductByID"
+	parameterType="com.huoli.bmall.points.model.Product"
+	resultType="com.huoli.bmall.points.model.Product">
+		select * from product where productid=#{0}; 
+	</select>
+	<select id="getGroups"
+	resultType="com.huoli.bmall.points.model.Group">
+		select * from groups where status = 1 order by groupid; 
+	</select>
+	<select id="getNGroups"
+	parameterType="java.lang.Integer"
+	resultType="com.huoli.bmall.points.model.NGroup">
+		select * from ngroups t where t.status = 1 order by t.order desc; 
+	</select>
+	<select id="getCheckinRules"
+	resultType="com.huoli.bmall.points.model.CheckinRule">
+		select begin,end,point,next,param,msg from checkrule where status = 1 order by begin; 
+	</select>
+	<select id="getHbCheckinRules"
+	resultType="com.huoli.bmall.points.model.CheckinRule">
+		select begin,end,point,next,param,msg  from hbcheckrule where status = 1 order by begin; 
+	</select>
+	<select id="getBanners"
+		parameterType="java.lang.Integer"
+		resultType="com.huoli.bmall.points.model.Banner">
+		select productid,img,title,url from banner where status = 1 and pos = #{pos} order by sort; 
+	</select>
+	<select id="getBannersByPosStr" parameterType="com.huoli.bmall.points.model.Banner" statementType="STATEMENT" 
+		resultType="com.huoli.bmall.points.model.Banner">
+		select productid,img,title,url,pos from banner where status = 1 and pos in ${posStr} order by sort; 
+	</select>	
+	<select id="getECode"
+	resultType="com.huoli.bmall.points.model.ECode">
+		select * from ecode where productId = #{0}  and status = 1 and (now() between activetime and deactivetime) 
+		order by activetime,ecodeid limit #{1}
+	</select>
+	<select id="getECodeByID"
+	parameterType="java.lang.Integer"
+	resultType="com.huoli.bmall.points.model.ECode">
+		select * from ecode where ecodeid = #{ecodeid}
+	</select>
+	<select id="getECodeByEcode"
+	resultType="com.huoli.bmall.points.model.ECode">
+		select * from ecode where productid = #{0} and ecode = #{1}
+	</select>
+	<select id="getProductParams"
+		parameterType="java.lang.Integer"
+		resultType="com.huoli.bmall.model.jsonresp.Input">
+		select `name`,`code`,`desc`,classname,`type`,thirdpartcode from paramdef where productid = #{productid} and status=1 order by sort
+	</select>
+    <update id="useECode" parameterType="com.huoli.bmall.points.model.ECode" 
+        flushCache="true">  
+        update ecode set status = 2, usetime = now(),address=#{orderid},phone=#{phone}  
+        where ecodeid = #{ecodeid}
+    </update>	
+    <update id="ECodeRollback" parameterType="com.huoli.bmall.points.model.ECode" 
+        flushCache="true">  
+        update ecode set status = 1, usetime = null
+        where ecodeid = #{ecodeid}
+    </update>
+	<select id="getEcodeCount"
+		parameterType="com.huoli.bmall.points.model.Product"
+		resultType="java.lang.Integer">
+		select count(*) from ecode where productId = #{productid}  and status = 1 and (now() between activetime and deactivetime)
+	</select>
+	<select id="getAllEcodeCount"
+		resultType="com.huoli.bmall.points.model.ECodeCount">
+		SELECT productid, SUM(IF (NOW() BETWEEN activetime AND deactivetime, 1 ,0 )) todaycount, SUM(IF(now()  &lt;  activetime,1,0)) morecount
+		FROM ecode WHERE `status` =1 
+		GROUP BY productid
+	</select>
+	<select id="haveMoreCode"
+		parameterType="com.huoli.bmall.points.model.Product"
+		resultType="java.lang.Integer">
+		select count(*) from ecode where productId = #{productid} and status = 1 and (now() between now() - 10000 and activetime)
+	</select>
+	<select id="allHbProduct"
+	parameterType="com.huoli.bmall.points.model.Product"
+	resultType="com.huoli.bmall.points.model.Product">
+		select * from hbproduct where status &lt; 50 order by IF(ISNULL(sort),1,0), sort, createtime desc,productid desc; 
+	</select>
+	<select id="getHbGroups"
+	resultType="com.huoli.bmall.points.model.Group">
+		select * from hbgroups where status = 1 order by groupid; 
+	</select>
+	<select id="getHbBanners"
+	resultType="com.huoli.bmall.points.model.Banner">
+		select productid,img,title,url from hbbanner where status = 1 order by sort; 
+	</select>	
+	<select id="getHbECode"
+	parameterType="com.huoli.bmall.points.model.Product"
+	resultType="com.huoli.bmall.points.model.ECode">
+		select * from hbecode where productId = #{productid}  and status = 1 and (now() between activetime and deactivetime) order by activetime limit 1
+	</select>
+	<select id="getHbECodeByID"
+	parameterType="java.lang.String"
+	resultType="com.huoli.bmall.points.model.ECode">
+		select * from hbecode where ecodeid = #{ecodeid}
+	</select>
+	<select id="getHbECodeByEcode"
+	resultType="com.huoli.bmall.points.model.ECode">
+		select * from hbecode where productid = #{0} and ecode = #{1}
+	</select>
+    <update id="useHbECode" parameterType="com.huoli.bmall.points.model.ECode" 
+        flushCache="true">  
+        update hbecode set status = 2, usetime = now()  
+        where ecodeid = #{ecodeid}
+    </update>	
+    <update id="HbECodeRollback" parameterType="com.huoli.bmall.points.model.ECode" 
+        flushCache="true">  
+        update hbecode set status = 1, usetime = null
+        where ecodeid = #{ecodeid}
+    </update>
+	<select id="getHbEcodeCount"
+		parameterType="com.huoli.bmall.points.model.Product"
+		resultType="java.lang.Integer">
+		select count(*) from hbecode where productId = #{productid}  and status = 1 and (now() between activetime and deactivetime)
+	</select>
+	<select id="getAllHbEcodeCount"
+		resultType="com.huoli.bmall.points.model.ECodeCount">
+		SELECT productid, SUM(IF (NOW() BETWEEN activetime AND deactivetime, 1 ,0 )) todaycount, SUM(IF(now()  &lt;  activetime,1,0)) morecount
+		FROM hbecode WHERE `status` =1 
+		GROUP BY productid
+	</select>
+	<select id="haveMoreHbCode"
+		parameterType="com.huoli.bmall.points.model.Product"
+		resultType="java.lang.Integer">
+		select count(*) from hbecode where productId = #{productid} and status = 1 and (now() between now() - 10000 and activetime)
+	</select>
+	<select id="getGtProductDetail"
+		resultType="com.huoli.bmall.points.model.DetailElement">
+		SELECT cssname,comment from gtproductdetail where productid = #{0} and status=1 and groupid=#{1} order by `sort`
+	</select>	
+	<insert id="warning" flushCache="true">
+		insert into warning (date, `desc`, level, `class`) values
+		(
+			now()
+			,#{0,jdbcType=VARCHAR}
+			,#{1,jdbcType=INTEGER}
+			,#{2,jdbcType=VARCHAR}
+		)
+	</insert>
+	<select id="getAllAdv" resultType="com.huoli.bmall.points.model.Advertising">
+		select advid,position, name, url, image, type, locations, display, sort from advertising
+		where status = 1 
+		order by position,sort, locations desc;
+	</select>
+	
+	<!-- 获取第三方配置信息 -->	
+	<select id="getThirdPartDef" resultType="com.huoli.bmall.adapter.model.ThirdPartDef">
+		select * from thirdpartdef where status = 1
+	</select>
+	<select id="getAllSku" resultType="com.huoli.bmall.points.model.sku.Sku">
+		select * from sku where status = 1
+	</select>
+
+	<select id="getAllSkuMap" resultType="com.huoli.bmall.points.model.sku.SkuMap">
+		select * from skumap a inner join sku b on a.skuid = b.skuid where b.status = 1
+	</select>
+
+    <update id="saveSkuMap" parameterType="com.huoli.bmall.points.model.sku.SkuMap" 
+        flushCache="true">  
+        update skumap set uselock = #{uselock}
+        where id = #{id}
+    </update>
+
+    <update id="saveSku" parameterType="com.huoli.bmall.points.model.sku.Sku" 
+        flushCache="true">  
+        update sku set usequantity = #{usequantity}
+        where skuid = #{skuid}
+    </update>
+    
+    <select id="getAllIrrigation" resultType="com.huoli.bmall.points.model.goods.GoodsIrrigation">
+		select * from product_irrigation where status = 1
+	</select>
+	
+</mapper>

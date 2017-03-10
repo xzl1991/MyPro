@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.PopUpDao">
+
+	<select id="getPopUp"
+	parameterType="java.lang.Integer"
+	resultType="com.huoli.bmall.points.model.PopUp">
+		select * from popup where status = 1 and app=#{app}
+		order by position, sort
+	</select>
+	
+	<select id="getUserPop" resultType="com.huoli.bmall.points.model.UserPop">
+		select * from user_pop where userid=#{0}
+	</select>
+	
+	<insert id="savaUserPop" parameterType="com.huoli.bmall.points.model.UserPop"  flushCache="true">
+		 insert into user_pop(userid, phone,curdate) 
+		values ( #{userid,jdbcType=VARCHAR}
+		        ,#{phone,jdbcType=VARCHAR}
+		        ,#{curdate,jdbcType=VARCHAR}
+				)
+	</insert>
+	
+	<update id="updateUserPop" parameterType="com.huoli.bmall.points.model.UserPop" flushCache="true">
+		update user_pop set curdate = #{curdate},lastsecdate=#{lastsecdate} , lastthidate=#{lastthidate} where userid = #{userid}
+	</update>
+</mapper>

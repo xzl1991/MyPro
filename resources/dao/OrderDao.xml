@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.OrderDao">
+	<select id="getZOrderList" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.OrderMain">
+	select b.*,c.spec from (
+		select a.orderid,a.productId,a.userid, a.ptotal, a.pprice,a.mprice,a.title, a.img, a.status, date_format(a.createtime,'%Y年%m月%d日') createtime
+		,a.paytype,a.payorderid, a.mtotal,a.style,a.gettype,a.type,a.ecodestatus,a.productsubid,a.ecode,a.privilprice
+		,a.app,a.openid,a.`from`,a.hbuserid,a.gjorderid,a.amount
+		from ${table} a force index(app)  
+		where a.userid='${userid}' and a.`status` &lt; 100 and a.`orderid` &lt; '${lastid}' and a.app=${app}
+		order by a.orderid desc
+		limit 20 ) b left join goodspec c on b.productId=c.productid and b.productsubid=c.goodspecid
+	</select>
+	<select id="searchZOrder" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT" 
+	resultType="com.huoli.bmall.points.model.OrderMain">
+		select b.*,c.spec from (
+		select a.orderid,a.productId,a.userid, a.ptotal, a.pprice,a.mprice,a.title, a.img, a.status, date_format(a.createtime,'%Y年%m月%d日') createtime
+		,a.paytype,a.payorderid, a.mtotal,a.style,a.gettype,a.type,a.ecodestatus,a.productsubid,a.ecode,a.privilprice
+		,a.app,a.openid,a.`from`,a.hbuserid,a.gjorderid,a.amount
+		from ${table} a force index(app)  
+		where a.userid='${userid}' and a.`status` &lt; 100 and a.`orderid` &lt; '${lastid}' and a.title like concat('%','${key}','%') 
+		and a.app=${app}
+		order by a.orderid desc
+		limit 20 ) b left join goodspec c on b.productId=c.productid and b.productsubid=c.goodspecid
+	</select>
+
+	<select id="getWaitZOrderList" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	 resultType="com.huoli.bmall.points.model.OrderMain">
+		select b.*,c.spec from (
+		select a.orderid,a.productId,a.userid, a.ptotal, a.pprice,a.mprice,a.title, a.img, a.status, date_format(a.createtime,'%Y年%m月%d日') createtime
+		,a.paytype, a.payorderid,a.mtotal,a.style,a.gettype,a.type,a.ecodestatus,a.productsubid,a.ecode,a.privilprice
+		,a.app,a.openid,a.`from`,a.hbuserid,a.gjorderid,a.amount
+		from ${table} a force index(app)  
+		where a.userid='${userid}' and a.`status` =0  and 
+		a.`orderid` &lt; '${lastid}' and a.app=${app}
+		order by a.orderid desc
+		limit 20 ) b left join goodspec c on b.productId=c.productid and b.productsubid=c.goodspecid
+	</select>
+	
+	<select id="getNeedExpressZOrderList" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	 resultType="com.huoli.bmall.points.model.OrderMain">
+		select b.*,c.spec from (
+		select a.orderid,a.productId,a.userid, a.ptotal, a.pprice,a.mprice,a.title, a.img, a.status, date_format(a.createtime,'%Y年%m月%d日') createtime
+		,a.paytype, a.payorderid,a.mtotal,a.style,a.gettype,a.type,a.ecodestatus,a.productsubid,a.ecode,a.privilprice
+		,a.app,a.openid,a.`from`,a.hbuserid,a.gjorderid,a.amount
+		from ${table} a force index(app)  
+		where a.userid='${userid}' and a.`status` in (2,3) and a.`orderid` &lt; '${lastid}'  and a.app=${app}
+		order by a.orderid desc
+		limit 20 ) b left join goodspec c on b.productId=c.productid and b.productsubid=c.goodspecid
+	</select>
+	
+	<select id="getSuccZOrderList" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.OrderMain">
+		select b.*,c.spec from (
+		select a.orderid,a.productId,a.userid, a.ptotal, a.pprice,a.mprice,a.title, a.img, a.status, date_format(a.createtime,'%Y年%m月%d日') createtime
+		,a.paytype,a.payorderid, a.mtotal,a.style,a.gettype,a.type,a.ecodestatus,a.productsubid,a.ecode,a.privilprice
+		,a.app,a.openid,a.`from`,a.hbuserid,a.gjorderid,a.amount
+		from ${table} a force index(app)   
+		where a.userid='${userid}' and( a.`status` in (1,4) or  (a.`status`  in (2,3) and a.ecodestatus=0)) and a.`orderid` &lt; '${lastid}' and a.app=${app}
+		order by a.orderid desc
+		limit 20 ) b left join goodspec c on b.productId=c.productid and b.productsubid=c.goodspecid
+	</select>
+	
+	<select id="getCancelZOrderList" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.OrderMain">
+		select b.*,c.spec from (
+		select a.orderid,a.productId,a.userid, a.ptotal, a.pprice,a.mprice,a.title, a.img, a.status, date_format(a.createtime,'%Y年%m月%d日') createtime
+		,a.paytype,a.payorderid, a.mtotal,a.style,a.gettype,a.type,a.ecodestatus,a.productsubid,a.ecode,a.privilprice
+		,a.app,a.openid,a.`from`,a.hbuserid,a.gjorderid,a.amount
+		from ${table} a force index(app)   
+		where a.userid='${userid}' and a.`status` =7 and a.`orderid` &lt; '${lastid}' and a.app=${app}
+		order by a.orderid desc
+		limit 20 ) b left join goodspec c on b.productId=c.productid and b.productsubid=c.goodspecid
+	</select>
+	
+	<select id="getZOrderDetail" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	 resultType="com.huoli.bmall.points.model.ZOrder">
+		select a.orderid, a.productId, a.ecode, a.userid, a.ptotal,a.pprice,a.mprice, a.title, a.img, a.status, a.style, 
+		date_format(a.createtime,'%Y-%m-%d %H:%i:%s') createtime,a.paytype, a.payorderid, a.paytime, a.payuserid, a.mtotal, 
+		a.expdate, a.phone, a.gettype,a.type,a.ecodestatus,a.paystatus, a.amount,a.paymsec,a.app,a.openid,a.`from`,a.hbuserid,
+		a.gjorderid,a.productsubid,b.spec
+		from  ${table} a left join goodspec b on a.productId=b.productid and a.productsubid=b.goodspecid 
+		where a.orderid='${orderid}'  and a.userid = '${userid}' and a.app=${app}
+	</select>
+	
+	<select id="getZOrderByID" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT" resultType="com.huoli.bmall.points.model.ZOrder">
+		select a.orderid, a.productId, a.ecode, a.userid, a.ptotal,a.pprice,a.mprice, a.title, a.img, a.status, a.style, 
+		date_format(a.createtime,'%Y-%m-%d %H:%i:%s') createtime,a.paytype, a.payorderid, a.paytime, a.payuserid, a.mtotal, 
+		a.expdate, a.phone, a.gettype,a.type,a.ecodestatus,a.paystatus, a.amount,a.paymsec,a.app,a.openid,a.`from`,a.hbuserid,
+		a.gjorderid,a.productsubid,b.spec
+		from  ${table} a left join goodspec b on a.productId=b.productid and a.productsubid=b.goodspecid where a.orderid = '${orderid}' 
+		<if test="app != null">
+        	and a.app=${app}
+        </if>
+	</select>
+	
+	<select id="getNewOrderID" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT" resultType="java.lang.String">
+		select CONCAT(SUBSTR(orderid,1,LENGTH(orderid)-1),SUBSTR(userid,-1),
+		CASE when bonus=321 then '1'
+		when bonus=322 then '1'
+		when bonus=10322 then '1'
+		when bonus=401 then '2' 
+		else '0' end,SUBSTR(orderid,-1)) orderid
+		from  ${table} where orderid = '${orderid}' 
+	</select>
+	
+	<select id="getZOrderByPayOrderId" parameterType="com.huoli.bmall.points.model.OrderQuery" statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.ZOrder">
+		select orderid,productId,ecode, userid, ptotal,pprice,mprice, title, img, status,style, date_format(createtime,'%Y-%m-%d %H:%i:%S') createtime, 
+		paytype,payorderid, paytime, payuserid,mtotal,expdate,phone,gettype,type, ecodestatus,paystatus,
+		productsubid, amount,paymsec,app,openid,`from`,hbuserid,gjorderid
+		from   ${table} where status = 0 and payorderid ='${payorderid}'
+		 <if test="app != null">
+        	and app=${app}
+        </if>
+	</select>
+	
+	<select id="getNotPayZOrder" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.OrderQuery"
+	resultType="com.huoli.bmall.points.model.ZOrder">
+		select orderid,productId,ecode, userid, ptotal,pprice,mprice, title, img, status,style, date_format(createtime,'%Y-%m-%d %H:%i:%s') createtime, 
+		 paytype,payorderid, paytime, payuserid,mtotal,expdate,phone,gettype, type,ecodestatus, paystatus,
+		 productsubid,amount,paymsec,app,openid,`from`,hbuserid,gjorderid
+		from   ${table} where 
+		<![CDATA[
+		(status = 0 and payorderid is not null)
+		]]>  or status = 5
+	</select>	
+	
+	<select id="getGiftOffOrder" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.OrderQuery"
+	resultType="com.huoli.bmall.points.model.ZOrder">
+		select orderid,productId,ecode, userid, ptotal,pprice,mprice, title, img, status,style, date_format(createtime,'%Y-%m-%d %H:%i:%s') createtime, 
+		 paytype,payorderid, paytime, payuserid,mtotal,expdate,phone,gettype, type,ecodestatus, paystatus,
+		 productsubid,amount,paymsec,app,openid,`from`,hbuserid,gjorderid
+		from  ${table} where status=3 and ecodestatus=300
+	</select>		
+	
+	<select id="getThirdPartSynZOrder" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.OrderQuery"
+	resultType="com.huoli.bmall.points.model.ZOrder">
+		select orderid,productId,ecode, userid, ptotal, pprice,mprice,title, img, status,style, date_format(createtime,'%Y-%m-%d %H:%i:%s') createtime, 
+		 paytype,payorderid, paytime, payuserid,mtotal,expdate,phone,gettype,type, ecodestatus,paystatus, 
+		 productsubid,amount,paymsec,app,openid,`from`,hbuserid,gjorderid
+		from   ${table} where status = 0 and gettype &gt; 200 and gettype &lt; 300 
+	</select>
+	
+	<select id="getUserZOrderList" parameterType="com.huoli.bmall.points.model.OrderQuery" statementType="STATEMENT" 
+	resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount))
+		from ${table} where userid='${userid}' 
+		<if test="checkstatus==0">
+		 and  (`status` &lt; 4 or `status`=701 or `status`=999)  and app=${app}
+		</if>
+		<if test="checkstatus==1">
+		 and  (`status` =1  or `status`=2  or `status`=3 or `status`=701 or `status`=999 )  and app=${app}
+		</if>
+		<if test="today==1">
+		  and orderid &gt;= CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,'') 
+		</if>
+		<if test="checkrel==1">
+		  and productid in ${relproducts}
+		</if>
+		<if test="checkrel==0">
+		 and `productid` = ${productid} 
+		</if>
+	</select>
+           
+	<select id="getProductTotalZOrderCount" parameterType="com.huoli.bmall.points.model.OrderQuery" statementType="STATEMENT" 
+	resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount)) `count` 
+		from   ${table} where productid = ${productid} 
+		<if test="productsubid>100">
+		  and productsubid = ${productsubid}
+		</if>
+		and (`status` in (0,1,2,3,701,999)) 
+		<if test="app != null">
+        	and app=${app}
+        </if>
+	</select>
+	<select id="getProductTodayZOrderCount" parameterType="com.huoli.bmall.points.model.OrderQuery" statementType="STATEMENT"  resultType="java.lang.Integer">
+		SELECT if(ISNULL(sum(amount)),0,sum(amount))  `todayNum` 
+		from   ${table} where  productid= ${productid} 
+		<if test="productsubid>100">
+		  and productsubid = ${productsubid}
+		</if>
+		and orderid &gt;= CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,'') 
+		and (status in (0,1,2,3,701,999)) 
+		<if test="app != null">
+        	and app=${app}
+        </if>
+	</select>
+	<select id="getProductLockZOrderCount" parameterType="com.huoli.bmall.points.model.OrderQuery" statementType="STATEMENT"  resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount)) `count` 
+		from   ${table} where productid = ${productid} 
+		<if test="productsubid>100">
+		  and productsubid = ${productsubid}
+		</if>
+		and status=0 
+		<if test="app != null">
+        	and app=${app}
+        </if>
+	</select>
+	
+	<select id="getProductDbCount" parameterType="com.huoli.bmall.points.model.OrderQuery" statementType="STATEMENT"  
+	resultType="com.huoli.bmall.points.model.group.ProductDbCount">
+		select sum(if(status=1 or status=0 or status=2 or status=3 or status =701 or status=999,amount,0)) dbtotal,
+		sum(if( orderid &gt;= CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,'') and (status=1 or status=0 or status=2 or status=3 or status =701 or status=999),amount,0)) dbtoday,
+		sum(if(status=0,amount,0)) dblock 
+		from   ${table} where productid = ${productid} 
+		<if test="productsubid>100">
+		  and productsubid = ${productsubid}
+		</if>
+		<if test="app != null">
+        	and app=${app}
+        </if>
+	</select>
+    
+    <insert id="createZOrder" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.ZOrder" 
+        flushCache="true">  
+        insert into   ${table} (orderid,productId,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,
+        payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,privilprice,paymsec,paystatus,parent,type,
+        productsubid,discount,ip,app,openid,`from`,hbuserid,gjorderid,unionid,wxname,platform,realpay) 
+		values ( '${orderid}'
+				,${productid}
+				,'${userid}'
+				,now()
+				<if test="ecode != null">
+				,'${ecode}'
+				</if>
+				<if test="ecode == null">
+				,null
+				</if>
+				,${pprice}
+				,'${title}'
+				,'${img}'
+				,${status}
+				<if test="payorderid != null">
+				,'${payorderid}'
+				</if>
+				<if test="payorderid == null">
+				,null
+				</if>
+				<if test="paytime != null">
+				,'${paytime}'
+				</if>
+				<if test="paytime == null">
+				,null
+				</if>
+				,${paytype}
+				,${mprice}
+				<if test="payuserid != null">
+				,'${payuserid}'
+				</if>
+				<if test="payuserid == null">
+				,null
+				</if>
+				,'${expdate}'
+				,'${phone}'
+				,${gettype}
+				,${bonustype}
+				,${ecodestatus}
+				,${ptotal}
+				,${mtotal}
+				,${amount}
+				,${style}
+				,'${couponid}'
+				,${privilprice}
+				,'${paymsec}'
+				,${paystatus}
+				<if test="parent != null">
+				,'${parent}'
+				</if>
+				<if test="parent == null">
+				,null
+				</if>
+				,${type}
+				,${productsubid}
+				,${discount}
+				,'${ip}'
+				,${app}
+				<if test="openid != null">
+				,'${openid}'
+				</if>
+				<if test="openid == null">
+				,null
+				</if>
+				<if test="from != null">
+				,'${from}'
+				</if>
+				<if test="from == null">
+				,null
+				</if>
+				,'${hbuserid}'
+				<if test="gjorderid != null">
+				,'${gjorderid}'
+				</if>
+				<if test="gjorderid == null">
+				,null
+				</if>
+				<if test="unionid != null">,'${unionid}'</if><if test="unionid == null">,null</if>
+				<if test="wxname != null">,'${wxname}'</if><if test="wxname == null">,null</if>
+				<if test="platform != null">,'${platform}'</if><if test="platform == null">,null</if>
+				<if test="realpay != null">,'${realpay}'</if><if test="realpay == null">,null</if>
+				) 
+    </insert>
+     
+    <update id="chgZOrderStatus" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.ZOrder" 
+        flushCache="true">  
+        update   ${table}
+        <set>
+        	status = ${status},
+        	paystatus = ${paystatus},
+        	<if test="payuserid != null">
+        	payuserid = '${payuserid}',
+        	</if>
+        	<if test="payorderid != null">
+        	payorderid = '${payorderid}',
+        	</if>
+        	title = '${title}',
+        	expdate = '${expdate}',
+        	style = ${style},
+        	<if test="paytime != null and paytime !='null'">
+			paytime = '${paytime}',
+			</if>
+			<if test="privilprice != null and privilprice >0">
+			privilprice=${privilprice},
+			</if>
+			discount=${discount},
+        	gettype = ${gettype},
+        	ecode = '${ecode}',
+        	<if test="couponid != null and couponid !='null'">
+        	couponid = '${couponid}',
+        	</if>
+        	ecodestatus = ${ecodestatus}
+        </set>  
+        where orderid = '${orderid}' and app=${app}
+    </update> 
+    <update id="chgZOrderEcodeStatus" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.ZOrder" 
+        flushCache="true">  
+        update   ${table}
+        <set>
+        	ecodestatus = ${ecodestatus}
+        </set>  
+        where orderid = '${orderid}' and app=${app}
+    </update> 
+    
+    <update id="chgZOrderStatusAndEcodeStatus" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.ZOrder" 
+        flushCache="true">  
+        update   ${table}
+        <set>
+            status = ${status},
+        	ecodestatus = ${ecodestatus}
+        </set>  
+        where orderid = '${orderid}' and app=${app}
+    </update> 
+    
+     <update id="chgPayStatus" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.ZOrder" 
+        flushCache="true">  
+        update   ${table}
+        <set>
+        	status = ${riskstatus}
+        </set>  
+        where orderid = '${orderid}' and app=${app}
+    </update> 
+
+    <insert id="updateRefound" parameterType="com.huoli.bmall.points.model.ZOrder" flushCache="true">
+    	insert into refound(orderid, payorderid, refounddate, mprice, pprice,msg,productid,status,paytype,goodspecid,amount,createtime)
+    	values( #{orderid, jdbcType=VARCHAR}
+    			,#{payorderid, jdbcType=VARCHAR}
+    			,now()
+    			,#{mtotal, jdbcType=FLOAT}
+    			,#{ptotal, jdbcType=INTEGER}
+    			,#{refoundmsg, jdbcType=VARCHAR}
+    			,#{productid, jdbcType=INTEGER}
+    			,#{refoundstatus, jdbcType=INTEGER}
+    			,#{paytype, jdbcType=INTEGER}
+    			,#{productsubid, jdbcType=INTEGER}
+    			,#{amount, jdbcType=INTEGER}
+    			,#{createtime, jdbcType=VARCHAR}
+    			)
+    </insert>
+    
+    <insert id="createErrorZOrder" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.ZOrder" 
+        flushCache="true">  
+        insert into   ${table} (orderid,productId,userid,createtime,ecode,pprice,title,note,img,status,payorderid,paytime,paytype,mprice,
+        payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,privilprice,paymsec,paystatus,parent,
+        type,productsubid,discount,ip,app,openid,`from`,hbuserid,gjorderid,unionid,wxname,platform,realpay) 
+		values ( '${orderid}'
+				,${productid}
+				,'${userid}'
+				,now()
+				<if test="ecode != null">
+				,'${ecode}'
+				</if>
+				<if test="ecode == null">
+				,null
+				</if>
+				,${pprice}
+				,'${title}'
+				,'${note}'
+				,'${img}'
+				,${status}
+				,'${payorderid}'
+				<if test="paytime != null">
+				,'${paytime}'
+				</if>
+				<if test="paytime == null">
+				,null
+				</if>
+				,${paytype}
+				,${mprice}
+				,'${payuserid}'
+				,'${expdate}'
+				,'${phone}'
+				,${gettype}
+				,${bonustype}
+				,${ecodestatus}
+				,${ptotal}
+				,${mtotal}
+				,${amount}
+				,${style}
+				,'${couponid}'
+				,${privilprice}
+				,'${paymsec}'
+				,${paystatus}
+				<if test="parent != null">
+				,'${parent}'
+				</if>
+				<if test="parent == null">
+				,null
+				</if>
+				,${type}
+				,${productsubid}
+				,${discount}
+				,'${ip}'
+				,${app}
+				<if test="openid != null">,'${openid}'</if><if test="openid == null">,null</if>
+				<if test="from != null">,'${from}'</if><if test="from == null">,null</if>
+				,'${hbuserid}'
+				<if test="gjorderid != null">,'${gjorderid}'</if><if test="gjorderid == null">,null</if>
+				<if test="unionid != null">,'${unionid}'</if><if test="unionid == null">,null</if>
+				<if test="wxname != null">,'${wxname}'</if><if test="wxname == null">,null</if>
+				<if test="platform != null">,'${platform}'</if><if test="platform == null">,null</if>
+				<if test="realpay != null">,'${realpay}'</if><if test="realpay == null">,null</if>
+				) 
+    </insert>
+
+	<select id="getExpress" parameterType="java.lang.String" resultType="com.huoli.bmall.points.model.Express">
+		SELECT company, tracking, companyid
+		FROM express
+		where orderid=#{orderid}
+	</select>
+	
+	<select id="getExpressDetail" parameterType="java.lang.String" resultType="com.huoli.bmall.points.model.ExpressDetail">
+		SELECT *
+		FROM express_detail
+		where tracking=#{tracking}
+	</select>
+	
+	<insert id="warning" flushCache="true">
+		insert into orderwarning (orderid, oldstat, newstat, `time`) values
+		(
+			#{0,jdbcType=VARCHAR}
+			,#{1,jdbcType=INTEGER}
+			,#{2,jdbcType=INTEGER}
+			,now()
+		)
+	</insert>
+	
+	<insert id="applyRefound" parameterType="com.huoli.bmall.points.model.RefoundApply" flushCache="true">
+    	insert into refoundapply(orderid, userid,payorderid,phone,reason,content,status,createtime, app)
+    	values( #{orderid, jdbcType=VARCHAR}
+    			,#{userid, jdbcType=VARCHAR}
+    			,#{payorderid, jdbcType=VARCHAR}
+    			,#{phone, jdbcType=VARCHAR}
+    			,#{reason, jdbcType=VARCHAR}
+    			,#{content, jdbcType=VARCHAR}
+    			,#{status, jdbcType=INTEGER}
+    			,now()
+    			,#{app, jdbcType=INTEGER}
+    			)
+    </insert>
+    
+    <update id="updateRefoundApply"  parameterType="com.huoli.bmall.points.model.RefoundApply"  flushCache="true">  
+        update   refoundapply set status=#{status},refounddate=now()
+        where orderid = #{orderid}
+    </update>
+	
+	<select id="getRefoundApply" resultType="com.huoli.bmall.points.model.RefoundApply">
+		select * from refoundapply 
+		where orderid=#{0}
+	</select>
+	
+</mapper>

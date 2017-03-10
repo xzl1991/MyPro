@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!-- 配置数据源，并设置连接池 -->
+	<bean id="ds"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<!-- 设置数据库连接参数 -->
+		<!-- <property name="jdbcUrl" value="jdbc:mysql://192.168.10.1:3306/statistic?characterEncoding=utf-8"/> -->
+		<property name="jdbcUrl" value="jdbc:mysql://123.56.101.36:3306/statistic?characterEncoding=utf-8"/>
+		<property name="driverClass" value="com.mysql.jdbc.Driver"/>
+		<property name="user" value="testmall"/>
+		<property name="password" value="wjsohot32602"/>
+		<!-- 设置连接池参数 -->
+		<property name="initialPoolSize" value="3"/>
+		<property name="maxPoolSize" value="10"/>
+		<property name="minPoolSize" value="1"/>
+		<property name="acquireIncrement" value="2"/>
+		<property name="maxIdleTime" value="60"/>
+	</bean>
+	
+<!-- 
+#api.gaotie.prefix=http\://221.235.53.167:8080/
+#api.gaotie.userinfo=trainnet/assistant/innerApiV2.action
+ -->	

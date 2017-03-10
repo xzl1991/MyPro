@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.BonusDao">
+    <select id="getBonusTotalNum"
+	parameterType="com.huoli.bmall.points.model.Bonus"
+	resultType="com.huoli.bmall.points.model.OrderCount">
+		select orderid,productid,sum(total) total from (
+			select orderid,payorderid productid, COUNT(*) total  from zorders_0  where productid=#{productid}
+			and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_1  where productid=#{productid} 
+			and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_2  where productid=#{productid} 
+			and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_3  where productid=#{productid} 
+			and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_4  where productid=#{productid} 
+			and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_5  where productid=#{productid}
+			 and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_6  where productid=#{productid} 
+			and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_7  where productid=#{productid}
+			 and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_8  where productid=#{productid} 
+			and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+			select orderid,payorderid productid, COUNT(*) total  from zorders_9  where productid=#{productid} 
+			and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} ) b 
+			group by productid order by productid desc 
+	</select> 
+	
+	 <select id="getBonusTodayNum"
+	parameterType="com.huoli.bmall.points.model.Bonus"
+	resultType="com.huoli.bmall.points.model.OrderCount">
+		select orderid,productid,sum(today) today from (
+		select orderid,payorderid productid,sum(if(orderid &gt;= CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_0  where productid=#{productid}
+		and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_1  where productid=#{productid} 
+		and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_2  where productid=#{productid} 
+		and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_3  where productid=#{productid} 
+		and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_4  where productid=#{productid} 
+		and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_5  where productid=#{productid}
+		 and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_6  where productid=#{productid} 
+		and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_7  where productid=#{productid}
+		 and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_8  where productid=#{productid} 
+		and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} UNION
+		select orderid,payorderid productid,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_9  where productid=#{productid} 
+		and payorderid is not null and  (STATUS = 1 or status=2 OR STATUS = 0 or status = 9 or status = 999 ) and payorderid=#{bonusid} ) b
+		group by productid order by productid desc 
+	</select> 
+</mapper>

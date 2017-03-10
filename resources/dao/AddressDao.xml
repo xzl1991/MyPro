@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.AddressDao">
+	<select id="getUserAddress"
+	parameterType="java.lang.String"
+	resultType="com.huoli.bmall.points.model.UserAddress">
+		select addressid,userid, province, city, address,area, postcode, pphone, name from useraddress where userid=#{userid} and `status`=1
+		order by def desc, addressid desc
+	</select>
+	<select id="getHbUserAddress"
+	parameterType="java.lang.String"
+	resultType="com.huoli.bmall.points.model.UserAddress">
+		select addressid,userid, province, city, address,area, postcode, pphone, name from useraddress where hbuserid=#{userid}  and `status`=1 
+		order by def desc, addressid desc
+	</select>
+	<select id="getAddressByID"
+	parameterType="java.lang.Integer"
+	resultType="com.huoli.bmall.points.model.UserAddress">
+		select * from useraddress where addressid=#{addid} 
+	</select>
+	<select id="getGtUserId"
+	parameterType="java.lang.String"
+	resultType="java.lang.String">
+		select userid from useraddress where hbuserid=#{hbuserid}  and userid is not null limit 1 
+	</select>			
+	<select id="checkAddress"
+	parameterType="com.huoli.bmall.points.model.UserAddress"
+	resultType="com.huoli.bmall.points.model.UserAddress">
+		select * from useraddress where 
+			userid=#{userid}
+			and province =  #{province}
+			and city = #{city}
+			and address = #{address}
+			and pphone = #{pphone}
+			and name = #{name}
+			and postcode = #{postcode} limit 1
+	</select>	
+    <insert id="newUserAddress" parameterType="com.huoli.bmall.points.model.UserAddress" useGeneratedKeys="true" keyProperty="addressid"
+        flushCache="true">  
+        insert into useraddress(userid,province, city, address, pphone, postcode, name,hbuserid,area,status) 
+		values ( #{userid,jdbcType=VARCHAR}
+				,#{province,jdbcType=VARCHAR}
+				,#{city,jdbcType=VARCHAR}
+				,#{address,jdbcType=VARCHAR}
+				,#{pphone,jdbcType=VARCHAR}
+				,#{postcode,jdbcType=VARCHAR}
+				,#{name,jdbcType=VARCHAR}
+				,#{hbuserid,jdbcType=VARCHAR}
+				,#{area,jdbcType=VARCHAR}
+				,#{status,jdbcType=INTEGER}
+				) 
+    </insert>  
+   	<update id="updateUserAddress" parameterType="com.huoli.bmall.points.model.UserAddress" 
+        flushCache="true">  
+        update useraddress
+        <set>
+        	province = #{province,jdbcType=VARCHAR},
+        	city = #{city,jdbcType=VARCHAR},
+        	address = #{address,jdbcType=VARCHAR},
+        	pphone = #{pphone,jdbcType=VARCHAR},
+        	name = #{name,jdbcType=VARCHAR},
+        	postcode = #{postcode,jdbcType=VARCHAR},
+			area = #{area,jdbcType=VARCHAR}
+        </set>  
+        where addressid = #{addressid,jdbcType=INTEGER}
+    </update>  
+    
+   	<update id="delUserAddress" parameterType="java.lang.Integer" 
+        flushCache="true">  
+        update useraddress set `status`=2
+        where addressid = #{addressid,jdbcType=INTEGER}
+    </update> 
+   	<update id="setGtDefAddress"  
+        flushCache="true">  
+        update useraddress set def = (addressid = #{0,jdbcType=INTEGER})
+        where userid = #{1,jdbcType=VARCHAR}
+    </update> 
+   	<update id="setHbDefAddress"  
+        flushCache="true">  
+        update useraddress set def = (addressid = #{addressid,jdbcType=INTEGER})
+        where hbuserid = #{userid,jdbcType=VARCHAR}
+    </update> 
+	<select id="getProvinces"
+		resultType="com.huoli.bmall.model.Province">
+		SELECT * from province
+	</select>	
+     	
+</mapper>

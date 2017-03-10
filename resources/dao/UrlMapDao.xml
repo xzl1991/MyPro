@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.adapter.dao.UrlMapDao">
+
+	<select id="getUrlMap" parameterType="java.lang.Integer" resultType="com.huoli.bmall.points.model.group.UrlMap">
+		select * from urlmap
+		where status = 1 and app=#{app}
+	</select>
+	
+	<select id="getUrlMapById" parameterType="java.lang.Integer" resultType="com.huoli.bmall.points.model.group.UrlMap">
+		select * from urlmap
+		where status = 1 and id=#{id}
+	</select>
+	
+</mapper>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.adapter.dao.VirtualClickDao">
+
+	<select id="getVirtualClick" parameterType="java.lang.String" resultType="com.huoli.bmall.adapter.model.VirtualClick">
+		select id, position, url, method, rate, status, name, UNIX_TIMESTAMP(starttime)*1000 as starttime, UNIX_TIMESTAMP(endtime)*1000 as endtime from virtualclick
+		where status = 1
+		<![CDATA[
+			and DATE_FORMAT(starttime,'%Y-%m-%d') <= #{today} and DATE_FORMAT(endtime,'%Y-%m-%d') >= #{today}
+		]]>
+	</select>
+	
+</mapper>

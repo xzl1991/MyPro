@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.UserDao">
+
+     	
+	<select id="getCheckin"
+	parameterType="java.lang.String"
+	resultType="com.huoli.bmall.points.model.CheckIn">
+		select * from gtcheckin where userid=#{userid} 
+	</select> 	
+   	<update id="doCheckin" parameterType="com.huoli.bmall.points.model.CheckIn" 
+        flushCache="true">  
+        update gtcheckin
+        <set>
+        	lastcheck = now(),
+        	continuity = #{continuity,jdbcType=INTEGER},
+        </set>  
+        where userid = #{userid,jdbcType=VARCHAR}
+    </update>
+     <insert id="firstCheckin" parameterType="com.huoli.bmall.points.model.CheckIn" useGeneratedKeys="true" keyProperty="userid"
+        flushCache="true">  
+        insert into gtcheckin(userid,lastcheck, continuity, createtime) 
+		values ( #{userid,jdbcType=VARCHAR}
+				,now()
+				,#{continuity,jdbcType=INTEGER}
+				,now()
+				) 
+    </insert>  
+    <select id="getHbCheckin"
+	parameterType="java.lang.String"
+	resultType="com.huoli.bmall.points.model.CheckIn">
+		select * from hbcheckin where userid=#{userid} 
+	</select> 	
+    <select id="getGtBonus"
+	parameterType="java.lang.Integer"
+	resultType="com.huoli.bmall.points.model.Bonus">
+		SELECT *
+ 		FROM gtbonus
+ 		where productid = #{productid}
+		order by level,type desc,rate
+	</select> 
+	<select id="getBonusById"
+	parameterType="java.lang.Integer"
+	resultType="com.huoli.bmall.points.model.Bonus">
+		SELECT *
+ 		FROM gtbonus
+ 		where bonusid = #{bonusid}
+	</select> 
+    <select id="getGtBonusCount"
+	parameterType="java.lang.String"
+	resultType="com.huoli.bmall.points.model.OrderCount">
+		select productid,sum(total) total,sum(today) today from (
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;= CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_0  where productid=#{productid}
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_1  where productid=#{productid} 
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_2  where productid=#{productid} 
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_3  where productid=#{productid} 
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_4  where productid=#{productid} 
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_5  where productid=#{productid}
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_6  where productid=#{productid} 
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_7  where productid=#{productid}
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_8  where productid=#{productid} 
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) UNION
+		select bonustype productid, COUNT(*) total,sum(if(orderid &gt;=  CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,''),1,0)) today  from zorders_9  where productid=#{productid} 
+		and bonustype>0 and  (STATUS = 1 or status=3 OR STATUS = 0 or status = 9 or status = 999) ) b GROUP BY productid
+
+	</select> 
+		
+    <select id="getHbBonus"
+	parameterType="java.lang.Integer"
+	resultType="com.huoli.bmall.points.model.Bonus">
+		SELECT a.bonusid, a.productid, a.name, a.count, a.rate, a.begintime, a.msg, a.bonustype, a.bonus, a.type,a.img,
+ 		SUM(IF(b.createtime=NULL,0,1)) totalcount
+ 		,SUM(IF(DATE_FORMAT(b.createtime,'%Y%m%d')=CURDATE(),1,0)) todaycount
+		FROM hbbonus a LEFT JOIN hborders b ON a.bonusid = b.`payorderid`
+ 		where a.productid = #{productid}
+		GROUP BY a.bonusid, a.productid, a.name, a.count, a.rate, a.begintime, a.msg, a.bonustype, a.bonus, a.type,a.img
+		order by a.type desc,a.rate
+	</select> 	
+   	<update id="doHbCheckin" parameterType="com.huoli.bmall.points.model.CheckIn"
+        flushCache="true">  
+        update hbcheckin
+        <set>
+        	lastcheck = now(),
+        	continuity = #{continuity,jdbcType=INTEGER},
+        </set>  
+        where userid = #{userid,jdbcType=VARCHAR}
+    </update>
+     <insert id="firstHbCheckin" parameterType="com.huoli.bmall.points.model.CheckIn" useGeneratedKeys="true" keyProperty="userid"
+        flushCache="true">  
+        insert into hbcheckin(userid,lastcheck, continuity, createtime) 
+		values ( #{userid,jdbcType=VARCHAR}
+				,now()
+				,#{continuity,jdbcType=INTEGER}
+				,now()
+				) 
+    </insert>  
+    
+    <select id="getWhiteList"	resultType="com.huoli.bmall.points.model.WhiteUser">
+		SELECT * from whitelist 
+	</select> 
+	
+	<select id="getUserOrderCount" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	 resultType="com.huoli.bmall.model.jsonresp.user.UserOrderInfo">
+		select count(*) count,sum(if(`status` in (0,2,3) or ecodestatus=150  ,1,0)) pendingNum,sum(if(`status` in (1) ,1,0)) sucNum
+		from ${table}
+		where userid='${userid}' and (`status` in (0,2,3) ) and app=${app}
+	</select>
+	
+	<select id="getUserCrowdOrderCount" resultType="com.huoli.bmall.model.jsonresp.user.UserOrderInfo">
+	 
+		select count(*) pendingNum from zorders_crowd a where a.userid=#{0} and a.app=#{1} and a.`status`=1 
+		and not EXISTS (select productid from crowdresult b where a.productid=b.productid)
+	</select>
+	
+	<insert id="createGoodsCollect" parameterType="com.huoli.bmall.points.model.goods.GoodsCollect" flushCache="true">  
+        insert into product_collect(userid,hbuserid,productid,maintitle,collecttime,status,app) 
+		values ( 
+		#{userid,jdbcType=VARCHAR},
+		#{hbuserid,jdbcType=VARCHAR},
+		#{productid,jdbcType=INTEGER},
+		#{maintitle,jdbcType=VARCHAR},
+		now(),
+		#{status,jdbcType=INTEGER},
+		#{app,jdbcType=INTEGER}
+		) 
+    </insert>
+    
+    <select id="getUserCollect"  resultType="com.huoli.bmall.points.model.goods.GoodsCollect" flushCache="true"> 
+		select * from  product_collect where  userid=#{0} and productid=#{1} and app=#{2}
+	 </select>
+	 
+	 <select id="getUserCollectCount" resultType="com.huoli.bmall.model.jsonresp.user.UserCountResp">
+		select count(*) count,sum(if(status=1,1,0)) validnum 
+		,sum(if(status=2 or status=3,1,0)) invalidnum  
+		from product_collect
+		where userid=#{0} and app=#{1}
+	</select>
+    
+    <update id="chgCollectStat"  parameterType="com.huoli.bmall.points.model.goods.GoodsCollect" flushCache="true"> 
+		update product_collect set status = #{status}
+		<if test="tmpType==3">
+        	,collecttime = now()
+        </if>
+         where userid=#{userid} and app=#{app}
+		<if test="productidStr !=null">
+        	and productid in ${productidStr}
+        </if>
+        
+	 </update>
+	
+	<select id="getCollectList"  resultType="com.huoli.bmall.points.model.goods.GoodsCollect">
+	 
+		select * from  product_collect where userid=#{0} and app=#{1} and collecttime &lt; #{2}  and status = 1 order by collecttime desc limit 20;
+	</select>
+	
+	<select id="searchCollectList"  resultType="com.huoli.bmall.points.model.goods.GoodsCollect">
+	 
+		select * from  product_collect where userid=#{0} and app=#{1} and collecttime &lt; #{2}  
+		and status = 1 and maintitle like concat('%',#{3},'%') order by collecttime desc limit 20;
+	</select>
+	
+	
+</mapper>

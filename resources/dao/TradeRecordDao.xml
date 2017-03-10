@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.adapter.dao.TradeRecordDao">
+	<select id="getOrderTradeRecords"  resultType="com.huoli.bmall.adapter.model.TradeRecord">
+		select * from traderecord where userid=#{0} and orderid=#{1}
+	</select>
+	
+	
+	<insert id="addTradeRecord" parameterType="com.huoli.bmall.adapter.model.TradeRecord" flushCache="true">
+		 insert into traderecord(orderid,userid, payorderid, payprice, paysource, paysourcename,couponid,type,price,tradetime,outTradeNo,returnType,tradeNoType,groupid) 
+		values ( #{orderid,jdbcType=VARCHAR}
+				,#{userid,jdbcType=VARCHAR}
+				,#{payorderid,jdbcType=VARCHAR}
+				,#{payprice,jdbcType=FLOAT}
+				,#{paysource,jdbcType=INTEGER}
+				,#{paysourcename,jdbcType=VARCHAR}
+				,#{couponid,jdbcType=VARCHAR}
+				,#{type,jdbcType=INTEGER}
+				,#{price,jdbcType=FLOAT}
+				,#{tradetime,jdbcType=VARCHAR}
+				,#{outTradeNo,jdbcType=VARCHAR}
+				,#{returnType,jdbcType=FLOAT}
+				,#{tradeNoType,jdbcType=FLOAT}
+				,#{groupid,jdbcType=INTEGER}
+				)
+	</insert>
+	
+	<update id="setCouponId">
+		update traderecord set couponid=#{0} where payorderid = #{1} and (paysource=6 or paysourcename='coupon')
+	</update>
+	
+</mapper>

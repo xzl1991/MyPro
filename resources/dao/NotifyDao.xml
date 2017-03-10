@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.NotifyDao">
+	<select id="getNeedNotifys" resultType="com.huoli.bmall.points.model.Notify">
+		select * from notify where notifystatus=0
+	</select>
+	
+	<select id="findNotify" resultType="com.huoli.bmall.points.model.Notify">
+		select * from notify where orderid=#{0} and notifytype=#{1}
+	</select>
+	
+	<update id="chgNotifyStat" 	parameterType="com.huoli.bmall.points.model.Notify" flushCache="true"> 
+		update notify set notifystatus = #{notifystatus},sendtype=#{sendtype},notifytype=#{notifytype} where notifyid=#{notifyid}
+	 </update>
+	 
+	<select id="getNotifyTemplets" resultType="com.huoli.bmall.points.model.NotifyTemplet">
+		select * from notifytemplet where available=1
+	</select>
+	
+	<select id="getTempletById" parameterType="java.lang.Integer" resultType="com.huoli.bmall.points.model.NotifyTemplet">
+		select * from notifytemplet where templetid=#{templetid}
+	</select>
+	 
+	 
+	 <insert id="createNotify" parameterType="com.huoli.bmall.points.model.Notify" flushCache="true">  
+        insert into notify(templetid,orderid,notifystatus,productid,userid,sendtype,notifytype,refundedMoney,refundedPoints,ordertype) 
+		values ( 
+		#{templetid,jdbcType=INTEGER},
+		#{orderid,jdbcType=VARCHAR},
+		#{notifystatus,jdbcType=INTEGER},
+		#{productid,jdbcType=INTEGER},
+		#{userid,jdbcType=VARCHAR},
+		#{sendtype,jdbcType=INTEGER},
+		#{notifytype,jdbcType=INTEGER},
+		#{refundedMoney,jdbcType=FLOAT},
+		#{refundedPoints,jdbcType=INTEGER},
+		#{ordertype,jdbcType=INTEGER}
+		) 
+    </insert>
+</mapper>

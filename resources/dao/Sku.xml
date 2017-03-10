@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.SkuDao">
+	 <resultMap type="com.huoli.bmall.points.model.sku.Sku" id="Sku">
+        <id column="skuid" property="skuid" jdbcType="INTEGER" />
+	    <result column="quantity" property="quantity" jdbcType="INTEGER" />
+	    <result column="usequantity" property="usequantity" jdbcType="INTEGER" />
+         <!-- ofType指定 集合中的对象类型   可用  -->
+        <!--  <collection property="skuMap" ofType="com.huoli.bmall.points.model.sku.SkuMap"> -->
+        <!-- sku里面对应的list 前面的是类型        后面的是原型 -->
+         <collection property="skuMapList" ofType="com.huoli.bmall.points.model.sku.SkuMap">
+				<id column="Id" property="id" jdbcType="INTEGER" />
+			    <result column="skuid" property="skuid" jdbcType="INTEGER" />
+			    <result column="lock" property="lock" jdbcType="INTEGER" />
+			    <result column="uselock" property="uselock" jdbcType="INTEGER" />
+         </collection>   
+    </resultMap>
+    
+    <sql id="Base_Column_List" >
+	    skuid,storecode, secondAttribute, secondAttriValue, 
+	    state, storeName, erpId, quantity, usequantity
+  	</sql>
+    <select id="findSkuById" resultMap="Sku" parameterType="java.lang.Integer" >
+		select * FROM sku 
+		join skumap smp 
+		on smp.skuid = sku.skuid 
+		where sku.skuid = #{skuid,jdbcType=VARCHAR}
+	</select>
+	<select id="findSku" resultType="com.huoli.bmall.points.model.sku.Sku" >
+		select * FROM sku 
+		join  (
+		SELECT sum(smp.lock) as locks,sum(smp.uselock) as uselock,skuid from skumap smp
+		 GROUP BY smp.skuid
+		) as smp 
+		on smp.skuid = sku.skuid 
+	</select>
+
+	<!-- 
+  	
+	<select id="findSku" resultType="com.huoli.bmall.points.model.sku.Sku" parameterType="java.lang.Integer" flushCache="true">
+		select * from sku
+		<include refid="selectSkuSql"/>
+		where sku.skuid = #{id,jdbcType=VARCHAR}
+	</select>
+	<select id="findSkuById" resultType="com.huoli.bmall.points.model.sku.Sku" parameterType="java.lang.Integer" flushCache="true">
+		select * from sku
+		<include refid="selectSkuSql"/>
+		where sku.skuid = #{id,jdbcType=VARCHAR}
+	</select>
+	<select id="findSkuMap" resultType="com.huoli.bmall.points.model.sku.SkuMap" parameterType="java.lang.Integer" flushCache="true">
+		select uselock,lock
+		from skumap
+		where 
+		skuid = #{id,jdbcType=VARCHAR} 
+	</select>
+	<update id="updateSkuMap" parameterType="com.huoli.bmall.points.model.sku.SkuMap" flushCache="true">
+		update sku set  
+      <if test="lock != null">
+        lock = #{lock} 
+      </if>
+    </update>
+	-->
+		<sql id="selectSkuSql">
+  	 		join  (
+			SELECT sum(smp.lock) as locks,sum(smp.uselock) as uselock,skuid from skumap smp
+			 GROUP BY smp.skuid
+			) as smp 
+			on smp.skuid = sku.skuid 
+  		</sql>
+		<select id="findSkuByErp" resultType="com.huoli.bmall.points.model.sku.Sku" parameterType="com.huoli.bmall.points.model.sku.Sku" flushCache="true">
+			select * from sku
+			<include refid="selectSkuSql"/>
+			where  
+			<if test="erpId != null">
+	        	sku.erpid =  #{erpId} 
+	      	</if>
+	      	<if test="storecode != null">
+	      		and sku.storecode =  #{storecode} 
+	      	</if>
+	      	<if test="secondAttribute != null">
+	      		and sku.secondAttribute = #{secondAttribute}
+	      	</if>
+		</select>
+	
+	  <update id="updateSkuMapBatch"  parameterType="java.util.List" flushCache="true">
+        <foreach collection="list" item="skuMap" index="index" open="" close="" separator=";">
+				update skumap smp
+				<set>
+					smp.lock = #{skuMap.lock,jdbcType=VARCHAR} 
+				</set>
+				where id = #{skuMap.id,jdbcType=VARCHAR} 
+		 </foreach>
+    </update>
+	<update id="updateSku" parameterType="com.huoli.bmall.points.model.sku.Sku" flushCache="true">
+		update sku  
+		<set>
+	  	 	quantity = #{quantity,jdbcType=VARCHAR} 
+	  	  	 <if test="storeCode != null">
+       		 	,storeCode = #{storeCode,jdbcType=VARCHAR} 
+     	  	</if>
+       		<if test="secondAttribute != null">
+        		, secondAttribute = #{secondAttribute,jdbcType=VARCHAR} 
+      		</if>
+       		<if test="secondAttriValue != null">
+       		 , secondAttriValue = #{secondAttriValue,jdbcType=VARCHAR} 
+      		</if>
+       		<if test="storeName != null">
+       		 , storeName = #{storeName,jdbcType=VARCHAR} 
+     		 </if>
+      		<if test="erpId != null">
+        		,  erpId = #{erpId,jdbcType=VARCHAR} ,
+      		</if> 
+		</set>
+      	where skuid = #{skuid,jdbcType=VARCHAR} 
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

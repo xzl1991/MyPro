@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.CrowdDao">
+	<select id="getMsWinRecords"
+	resultType="com.huoli.bmall.points.model.CrowdGen">
+		select CONCAT(date_format(paytime,'%H%i%S'),paymsec) tvalue,CONCAT(date_format(paytime,'%Y-%m-%d %H:%i:%S'),'.',paymsec) `time`, phone account from 
+		zorders_crowd 
+		where productid=#{0} and (status = 1 or status=2 or status=701 ) and app=#{1}
+		order by `time` desc
+		limit 6
+	</select>
+	<select id="getZCrowdWinRecords" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.CrowdGen">
+		select CONCAT(date_format(paytime,'%H%i%S'),paymsec) tvalue,CONCAT(date_format(paytime,'%Y-%m-%d %H:%i:%S'),'.',paymsec) `time` , phone account from 
+		${table} 
+		where productid=${productid} and (status = 1 or status=2 or status=701 ) and app=${app}
+		order by `time` desc
+		limit 6
+	</select>
+	
+	<select id="getWinRecord"
+	resultType="com.huoli.bmall.points.model.CrowdParam">
+		select productid, userid, phone, orderid from crowdcode
+		where productid = #{0} and code = #{1}
+	</select>
+	
+	<select id="getWinner"
+	resultType="com.huoli.bmall.points.model.CrowdWinner">
+		select productid,wincode,userid,phone,paytime,date_format(createtime,'%Y-%m-%d %H:%i:%S') `time`,orderid,result,winnerbuynum from 
+		crowdresult 
+		where productid=#{0}
+	</select>
+	<select id="getResult"
+	resultType="com.huoli.bmall.points.model.CrowdWinner">
+		select productid,wincode,userid,phone,paytime,date_format(createtime,'%Y-%m-%d %H:%i:%S') `time`,orderid,result from 
+		crowdresult 
+		where productid=#{0}
+	</select>
+	
+	<insert id="setWinner"
+	parameterType="com.huoli.bmall.points.model.CrowdWinner">
+		insert into crowdresult(productid, wincode, userid, phone, paytime,result,orderid,winnerbuynum, createtime)
+		values ( #{productid,jdbcType=INTEGER}
+				,#{wincode,jdbcType=VARCHAR}
+				,#{userid,jdbcType=VARCHAR}
+				,#{phone,jdbcType=VARCHAR}
+				,#{paytime,jdbcType=VARCHAR}
+				,#{result,jdbcType=VARCHAR}
+				,#{orderid,jdbcType=VARCHAR}
+				,#{winnerbuynum,jdbcType=INTEGER}
+				,now()
+				) 
+	</insert>
+	
+	<select id="getWaitCount"
+	resultType="com.huoli.bmall.points.model.CrowdCount">
+		select sum(if(status=1 or status=2 or status =701 ,amount,0)) succcount,
+		sum(if(status>1,amount,0)) failcount, 
+		sum(if(status=0,amount,0)) waitcount
+		from 
+		zorders_crowd 
+		where productid=#{0} and app=#{1}
+	</select>
+	<select id="getZCrowdWaitCount" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.CrowdCount">
+		select sum(if(status=1 or status=2 or status=701 ,amount,0)) succcount,
+		sum(if(status>1,amount,0)) failcount, 
+		sum(if(status=0,amount,0)) waitcount
+		from 
+		${table} 
+		where productid=${productid} and app=${app}
+	</select>
+
+
+	<select id="getMsCrowdRecords"
+	resultType="com.huoli.bmall.points.model.CrowdRecord">
+		select orderid,phone,amount count,CONCAT(date_format(paytime,'%Y-%m-%d %T'),'.',paymsec) `time` from 
+		zorders_crowd 
+		where productid = #{0} and (status = 1 or status=2 or status=701 ) and app=#{2}
+		order by `time` desc
+		limit #{1}
+	</select>
+	<select id="getZCrowdRecords" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.CrowdRecord">
+		select orderid,phone,amount count,CONCAT(date_format(paytime,'%Y-%m-%d %T'),'.',paymsec) `time` from 
+		${table} 
+		where productid =${productid}  and (status = 1 or status=2 or status=701) and app=${app}
+		order by `time` desc
+		limit ${limit}
+	</select>
+	<select id="getCrowdCode"
+	resultType="com.huoli.bmall.points.model.CrowdCode">
+		select code from 
+		crowdcode 
+		where productid = #{0} and status = 1 
+		order by crowdid
+		limit #{1}
+	</select>
+	<update id="setGtFinish">
+		update product set expdate=#{1}, status = 99
+		where productid = #{0}
+	</update>
+	<update id="setHbFinish">
+		update hbproduct set expdate=#{1}, status = 99
+		where productid = #{0}
+	</update>
+	<update id="useCrowdCode"
+	parameterType="com.huoli.bmall.points.model.CrowdParam">
+		update crowdcode
+		set status = 2, userid = #{userid},phone = #{phone}, usetime = now(), orderid = #{orderid}, app = #{app}
+		where productid = #{productid} and status = 1 
+		order by crowdid
+		limit #{count}
+	</update>
+	<update id="releaseCrowdCode">
+		update crowdcode
+		set status = 1, usetime = null, userid = null, phone = null,app = null
+		where productid = #{0} and code = #{1}
+	</update>
+	<select id="getUserCrowdOrder"
+	resultType="com.huoli.bmall.points.model.ZOrder">
+		select orderid,productId,ecode, userid,style, ptotal,pprice,mprice, title, img, status, date_format(createtime,'%Y-%m-%d %H:%i:%s') createtime, paytype,payorderid, paytime,
+		 payuserid,mtotal,expdate,paymsec,phone,gettype, paystatus,amount,openid,`from`,hbuserid,gjorderid,ecodestatus
+		from zorders_crowd where productid=#{1}  and userid = #{0} and (status = 1 or status = 0 or status=2) and app=#{2}
+	</select>
+	<select id="getUserZCrowdOrder" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.ZOrder">
+		select orderid,productId,ecode, userid,style, ptotal,pprice,mprice, title, img, status,date_format(createtime,'%Y-%m-%d %H:%i:%s') createtime,paytype,payorderid,
+		 paytime, payuserid,mtotal,expdate,paymsec,phone,gettype ,paystatus, amount ,openid,`from`,hbuserid,gjorderid,ecodestatus
+		from ${table} where productid=${productid}  and userid = '${userid}' and (status = 1 or status = 0 or status=2) and app=${app}
+	</select>
+	
+	<select id="getCrowdOrderCount"
+	resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount))
+		from zorders_crowd where productid=#{0}  and (status = 1 or status = 0 or status=2 or status=701 ) and app=#{1}
+	</select>
+	<select id="getZCrowdOrderCount" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount))
+		from ${table} where productid=${productid}  and (status = 1 or status = 0 or status=2 or status=701 ) 
+		<if test="app != null">
+        	and app=${app}
+        </if>
+	</select>
+	<select id="getTodayOrderCount"
+	resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount))
+		from zorders_crowd where productid=#{0}  and (status = 1 or status = 0 or status=2 or status=701 ) and orderid &gt;= CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,'')  and app=#{1}
+	</select>
+	<select id="getTodayZOrderCount" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount))
+		from ${table} where productid=${productid}  and (status = 1 or status = 0 or status=2 or status=701 )  and orderid &gt;= CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,'') 
+		<if test="app != null">
+        	and app=${app}
+        </if>
+	</select>
+	<select id="getCrowdLockCount"
+	resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount))
+		from zorders_crowd where productid=#{0}  and status = 0 and app=#{1}
+	</select>
+	<select id="getZCrowdLockCount" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="java.lang.Integer">
+		select if(ISNULL(sum(amount)),0,sum(amount))
+		from ${table} where productid=${productid}  and status = 0
+		<if test="app != null">
+        	and app=${app}
+        </if>
+	</select>
+	
+	<select id="getProductDbCount" resultType="com.huoli.bmall.points.model.group.ProductDbCount">
+		select sum(if(status=1 or status=2 or status=701 or status=0,amount,0)) dbtotal,
+		sum(if( orderid &gt;= CONCAT((UNIX_TIMESTAMP(CURDATE())-1000000000) * 1000000,'') and (status=1 or status=2  or status=0 or status=701),amount,0)) dbtoday,
+		sum(if(status=0,amount,0)) dblock 
+		from  zorders_crowd where productid = #{0} 
+	</select>
+	
+	<select id="getAllGtResult"
+	resultType="com.huoli.bmall.model.jsonresp.CrowdWinnerResp">
+		select b.phone, a.smallimgurl img, a.title title, b.wincode, date_format(b.createtime ,'%Y-%m-%d %T')  `time`,b.winnerbuynum, a.productid, 6 action
+		from crowdresult b inner join product a on a.productid=b.productid 
+		order by b.createtime desc
+		limit 20
+	</select>
+	<select id="getAllGjResult"
+	resultType="com.huoli.bmall.model.jsonresp.CrowdWinnerResp">
+		select b.phone, a.smallimgurl img, a.title title, b.wincode, date_format(b.createtime ,'%Y-%m-%d %T') `time`,b.winnerbuynum, a.productid, 6 action
+		from crowdresult b inner join product a on a.productid=b.productid and LENGTH(a.appname) =6 
+		order by b.createtime desc
+		limit 20
+	</select>
+	<select id="getAllHbResult"
+	resultType="com.huoli.bmall.model.jsonresp.CrowdWinnerResp">
+		select b.phone, a.smallimgurl img, a.title title, b.wincode, date_format(b.createtime ,'%Y-%m-%d %T') `time`,b.winnerbuynum, a.productid, 6 action
+		from crowdresult b inner join hbproduct a on a.productid=b.productid 
+		order by b.createtime desc
+		limit 20
+	</select>
+	<select id="getUserBuyNum" resultType="java.lang.Integer">
+		select count(*) from crowdcode t where t.productid=#{0} and t.phone=#{1}
+	</select>
+	
+	<select id="getUserCrowdList" parameterType="java.lang.String" resultType="com.huoli.bmall.model.jsonresp.crowd.UserCrowdResp">
+		select min(a.orderid) orderid, a.phone,b.phone winphone,sum(a.amount) buynum,a.productid ,c.title,c.appname,if(a.userid=b.userid,1,0) winner,b.wincode,b.winnerbuynum,
+		if(ISNULL(b.wincode),5,4) sort,date_format(b.createtime,'%Y-%m-%d %H:%i:%S') 'time',c.smallImgUrl img
+		from zorders_crowd a left join crowdresult b on a.productId=b.productid
+		left join product c on a.productId=c.productid
+		where a.userid=#{0} and a.`orderid` &lt; #{1} and app=#{3}
+		and (a.status=1 or a.status=2) and (a.style=321 or a.style=322 or a.style=10322) 
+		group by a.productId 
+		order by min(a.orderid) desc
+		limit #{2};
+	</select>
+	
+	<select id="getHbUserCrowdList" parameterType="java.lang.String" resultType="com.huoli.bmall.model.jsonresp.crowd.UserCrowdResp">
+		select min(a.orderid) orderid, a.phone,b.phone winphone,sum(a.amount) buynum,a.productid ,c.title,c.appname,if(a.userid=b.userid,1,0) winner,b.wincode,b.winnerbuynum,
+		if(ISNULL(b.wincode),5,4) sort,date_format(b.createtime,'%Y-%m-%d %H:%i:%S') 'time',c.smallImgUrl img
+		from zorders_crowd a left join crowdresult b on a.productId=b.productid
+		left join hbproduct c on a.productId=c.productid
+		where a.userid=#{0} and a.`orderid` &lt; #{1} and app=#{3}
+		and (a.status=1 or a.status=2) and (a.style=321 or a.style=322 or a.style=10322) 
+		group by a.productId 
+		order by min(a.orderid) desc
+		limit #{2};
+	</select>
+	
+	<select id="getGjUserCrowdList" parameterType="java.lang.String" resultType="com.huoli.bmall.model.jsonresp.crowd.UserCrowdResp">
+		select min(a.orderid) orderid, a.phone,b.phone winphone,sum(a.amount) buynum,a.productid ,c.title,c.appname,if(a.userid=b.userid,1,0) winner,b.wincode,b.winnerbuynum,
+		if(ISNULL(b.wincode),5,4) sort,date_format(b.createtime,'%Y-%m-%d %H:%i:%S') 'time',c.smallImgUrl img
+		from zorders_crowd a left join crowdresult b on a.productId=b.productid 
+		inner join product c on a.productId=c.productid and LENGTH(c.appname) =6 
+		where a.userid=#{0} and a.`orderid` &lt; #{1} and app=2
+		and (a.status=1 or a.status=2) and (a.style=321 or a.style=322 or a.style=10322) 
+		group by a.productId 
+		order by min(a.orderid) desc
+		limit #{2};
+	</select>
+	
+	<select id="getUserZCrowdList" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT" resultType="com.huoli.bmall.model.jsonresp.crowd.UserCrowdResp">
+		select min(a.orderid) orderid, a.phone,b.phone winphone,sum(a.amount) buynum,a.productid ,c.title,c.appname,if(a.userid=b.userid,1,0) winner,b.wincode,b.winnerbuynum,
+		if(ISNULL(b.wincode),5,4) sort,b.createtime 'time',c.smallImgUrl img
+		from ${table} a left join crowdresult b on a.productId=b.productid
+		left join 
+		<if test="app==1">
+		    product
+		</if>
+		<if test="app==2">
+		   hbproduct
+		</if>
+		 c on a.productId=c.productid
+		where a.userid='${userid}' and a.`orderid` &lt; '${lastid}'
+		and (a.status=1 or a.status=2) and (a.style=321 or a.style=322 or a.style=10322) and app=${app}
+		group by a.productId 
+		order by min(a.orderid) desc
+		limit ${limit};
+	</select>
+	
+	
+	<select id="getGjUserZCrowdList" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT" resultType="com.huoli.bmall.model.jsonresp.crowd.UserCrowdResp">
+		select min(a.orderid) orderid, a.phone,b.phone winphone,sum(a.amount) buynum,a.productid ,c.title,c.appname,if(a.userid=b.userid,1,0) winner,b.wincode,b.winnerbuynum,
+		if(ISNULL(b.wincode),5,4) sort,b.createtime 'time',c.smallImgUrl img
+		from ${table} a left join crowdresult b on a.productId=b.productid 
+		inner join product c on a.productId=c.productid and LENGTH(c.appname) =6 
+		where a.userid='${userid}' and a.`orderid` &lt; '${lastid}'
+		and (a.status=1 or a.status=2) and (a.style=321 or a.style=322 or a.style=10322) and app=${app}
+		group by a.productId 
+		order by min(a.orderid) desc
+		limit ${limit};
+	</select>
+	
+	<select id="getErrorCrowdCode" resultType="com.huoli.bmall.points.model.CrowdCode">
+			
+	 select a.* from crowdcode a where a.productid=#{0} and a.`status`=2 and a.orderid not in 
+	 ( select b.orderid  from zorders_crowd b where b.productid=#{0} and b.`status` in (0,1,3,701) ); 
+	</select>
+	
+</mapper>

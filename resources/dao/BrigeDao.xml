@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.adapter.dao.BrigeDao">
+	<select id="getUserOrderCount"  resultType="java.lang.Integer">
+		select sum(c.count) count from 
+		(
+		select count(*) count from zorders_0  where app=2 and userid=#{0}  UNION
+		select count(*) count from zorders_1 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_2 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_3 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_4 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_5 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_6 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_7 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_8 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_9 where app=2 and userid=#{0}   UNION
+		select count(*) count from zorders_crowd where app=2 and userid=#{0}   
+		) c;
+	</select>
+	
+	
+	<insert id="addZOrderTemp" parameterType="com.huoli.bmall.points.model.ZOrder" flushCache="true">
+		insert into   ${table} (orderid,productId,userid,primaryphoneid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,
+        payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,privilprice,paymsec,paystatus,parent,type,
+        productsubid,discount,ip,app,openid,`from`,hbuserid,gjorderid) 
+		values ( '${orderid}'
+				,${productid}
+				,'${userid}'
+				,'${primaryphoneid}'
+				,now()
+				<if test="ecode != null">
+				,'${ecode}'
+				</if>
+				<if test="ecode == null">
+				,null
+				</if>
+				,${pprice}
+				,'${title}'
+				,'${img}'
+				,${status}
+				<if test="payorderid != null">
+				,'${payorderid}'
+				</if>
+				<if test="payorderid == null">
+				,null
+				</if>
+				<if test="paytime != null">
+				,'${paytime}'
+				</if>
+				<if test="paytime == null">
+				,null
+				</if>
+				,${paytype}
+				,${mprice}
+				<if test="payuserid != null">
+				,'${payuserid}'
+				</if>
+				<if test="payuserid == null">
+				,null
+				</if>
+				,'${expdate}'
+				,'${phone}'
+				,${gettype}
+				,${bonustype}
+				,${ecodestatus}
+				,${ptotal}
+				,${mtotal}
+				,${amount}
+				,${style}
+				,'${couponid}'
+				,${privilprice}
+				,'${paymsec}'
+				,${paystatus}
+				<if test="parent != null">
+				,'${parent}'
+				</if>
+				<if test="parent == null">
+				,null
+				</if>
+				,${type}
+				,${productsubid}
+				,${discount}
+				,'${ip}'
+				,${app}
+				<if test="openid != null">
+				,'${openid}'
+				</if>
+				<if test="openid == null">
+				,null
+				</if>
+				<if test="from != null">
+				,'${from}'
+				</if>
+				<if test="from == null">
+				,null
+				</if>
+				,'${hbuserid}'
+				<if test="gjorderid != null">
+				,'${gjorderid}'
+				</if>
+				<if test="gjorderid == null">
+				,null
+				</if>
+				) 
+	</insert>
+	
+	<select id="getUserZOrderList" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.ZOrder">
+	   select * from (
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_0  where app=2 and userid='${userid}'  UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_1 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_2 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_3 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_4 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_5 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_6 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_7 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_8 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_9 where app=2 and userid='${userid}'   UNION
+		select orderid,productid,userid,createtime,ecode,pprice,title,img,status,payorderid,paytime,paytype,mprice,payuserid,expdate,phone,gettype,bonustype,ecodestatus,ptotal,mtotal,amount,style,couponid,paymsec,paystatus,parent,type,productsubid,app,discount,privilprice,ip,openid,`from`,hbuserid,gjorderid from zorders_crowd where app=2 and userid='${userid}' 
+		) c
+	</select>
+	
+	<delete id="deleteOrderById" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT">
+		delete  from ${table}  where orderid='${orderid}';
+	</delete>
+	
+	<update id="updateZOrder" statementType="STATEMENT" parameterType="com.huoli.bmall.points.model.ZOrder" 
+        flushCache="true">  
+        update   ${table}
+        <set>
+        	<if test="hbuserid != null">
+        	hbuserid = '${hbuserid}',
+        	</if>
+        	userid = '${userid}'
+        </set>  
+        where orderid = '${orderid}' 
+    </update> 
+    
+    <select id="getZOrderByType" parameterType="com.huoli.bmall.points.model.OrderQuery" statementType="STATEMENT"
+	resultType="com.huoli.bmall.points.model.ZOrder">
+		select a.orderid, a.productId, a.ecode, a.userid, a.ptotal,a.pprice,a.mprice, a.title, a.img, a.status, a.style, 
+		date_format(a.createtime,'%Y-%m-%d %H:%i:%s') createtime,a.paytype, a.payorderid, a.paytime, a.payuserid, a.mtotal, 
+		a.expdate, a.phone, a.gettype,a.type,a.ecodestatus,a.paystatus, a.amount,a.paymsec,a.app,a.openid,a.`from`,a.hbuserid,
+		a.gjorderid,a.productsubid,b.spec
+		from  ${table} a left join goodspec b on a.productId=b.productid and a.productsubid=b.goodspecid where a.userid = '${userid}' 
+		and a.bonustype=-3
+	</select>
+	
+	<select id="getLeiLinOrderCount" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT"
+	 resultType="com.huoli.bmall.model.jsonresp.user.UserOrderInfo">
+		select count(*) count
+		from ${table}
+		where userid='${userid}' and (`status` in (998) ) and productid=${productid}
+	</select>
+	
+	<delete id="deleteTestOrder" parameterType="com.huoli.bmall.points.model.OrderQuery"  statementType="STATEMENT">
+		delete  from ${table} where  userid='${userid}' and productid=${productid};
+	</delete>
+	
+</mapper>

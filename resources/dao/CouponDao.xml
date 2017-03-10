@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.CouponDao">
+	<select id="getAllCouponRules" resultType="com.huoli.bmall.points.model.coupon.CouponRule">
+		select * from coupon_rule 
+	</select>
+	<select id="getCouponRulesByApp" resultType="com.huoli.bmall.points.model.coupon.CouponRule">
+		select * from coupon_rule where `status`=1
+	</select>
+	<select id="getCouponRules" resultType="com.huoli.bmall.points.model.coupon.CouponRule">
+		select * from coupon_rule where status=1
+	</select>
+    <insert id="giveUserCoupon" parameterType="com.huoli.bmall.points.model.coupon.UserCoupon" 
+        flushCache="true">  
+        insert into usercoupon(couponid,couponsort,userid,phone,productid,couponname,couponruleid,amount,reachnum,
+        groupid,createtime,stime,etime,bindtype,used,coupontype,rules,content,app) 
+		values ( 
+		#{couponid,jdbcType=VARCHAR},
+		#{couponsort,jdbcType=INTEGER},
+		#{userid,jdbcType=VARCHAR},
+		#{phone,jdbcType=VARCHAR},
+		#{productid,jdbcType=INTEGER},
+		#{couponname,jdbcType=VARCHAR},
+		#{couponruleid,jdbcType=INTEGER},
+		#{amount,jdbcType=FLOAT},
+		#{reachnum,jdbcType=FLOAT},
+		#{groupid,jdbcType=INTEGER},
+		#{createtime,jdbcType=VARCHAR},
+		#{stime,jdbcType=VARCHAR},
+		#{etime,jdbcType=VARCHAR},
+		#{bindtype,jdbcType=INTEGER},
+		#{used,jdbcType=INTEGER},
+		#{coupontype,jdbcType=INTEGER},
+		#{rules,jdbcType=VARCHAR},
+		#{content,jdbcType=VARCHAR},
+		#{app,jdbcType=INTEGER}
+		) 
+    </insert>
+	<select id="getUserCoupon"
+	resultType="com.huoli.bmall.points.model.coupon.UserCoupon">
+		select * from usercoupon 
+		where couponid=#{0}
+	</select>
+	<select id="getAllUserCoupons"
+	resultType="com.huoli.bmall.points.model.coupon.UserCoupon">
+		select * from usercoupon 
+		where used=0 and etime >now();
+	</select>	
+	<select id="getUserCoupons"
+	resultType="com.huoli.bmall.points.model.coupon.UserCoupon">
+		select * from usercoupon 
+		where userid=#{0} and used=0;
+	</select>
+	<update id="chgCouponStat" 	parameterType="com.huoli.bmall.points.model.coupon.UserCoupon" flushCache="true"> 
+		update usercoupon set used = #{0},usedtime=#{1} where couponid = #{2} and used=0;
+	 </update>
+	 
+	 <select id="getUserCouponNum" resultType="java.lang.Integer">
+		select count(*)
+ 		from usercoupon where couponruleid=#{0}  and userid=#{1}  and app=#{2}
+ 	</select>
+	 
+	<select id="getCouponTotalNum" resultType="java.lang.Integer">
+		select count(*)
+ 		from usercoupon where couponruleid=#{0}  and (used = 1 or used = 0)  and app=#{1}
+ 	</select>
+ 	<select id="getCouponTodayNum" resultType="java.lang.Integer">
+		select count(*)
+ 		from usercoupon where couponruleid=#{0}  and (used = 1 or used = 0) and createtime >= date_format(sysdate(),'%Y-%m-%d') and app=#{1}
+ 	</select>
+ 	
+ 	<select id="getUserMallCoupon"
+	resultType="com.huoli.bmall.model.jsonresp.user.UserCountResp">
+		select count(*) count,sum(if(a.used=0 and a.etime>now(),1,0)) validnum 
+		,sum(if(a.used=1 or now()>a.etime,1,0)) invalidnum  
+		from usercoupon a 
+		where  a.userid=#{0} and 
+		(a.app=#{1} or a.app=3);
+	</select>
+	 
+</mapper>

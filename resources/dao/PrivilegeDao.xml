@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.huoli.bmall.points.dao.PrivilegeDao">
+	<select id="getUserPrivils"  resultType="com.huoli.bmall.points.model.Privilege">
+		select * from privilege where status=1 and userid=#{0} and expiretime &gt; date_format(sysdate(),'%Y-%m-%d %H:%i:%S') 
+		and privilid &lt;#{1} and app=#{3} order by privilid desc limit #{2}
+	</select>
+	
+	<select id="getUserPrivilTotal"  resultType="com.huoli.bmall.model.jsonresp.crowd.UserPrivilResp">
+		select min(privilid) privilid,userid,SUM(amount) total,privilprice,name,content,app from privilege 
+        where userid=#{0} and amount &gt; usecount and status=1 and expiretime> date_format(sysdate(),'%Y-%m-%d %H:%i:%S') and app=#{1}
+	</select>
+
+    <select id="getPrivilege" parameterType="java.lang.Integer"  resultType="com.huoli.bmall.points.model.Privilege">
+		select * from privilege where privilid=#{privilid}
+	</select>
+	
+	<insert id="createPrivilege" parameterType="com.huoli.bmall.points.model.Privilege"  flushCache="true">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="privilid">
+		   SELECT LAST_INSERT_ID() AS privilid
+		</selectKey>
+		 insert into privilege(userid, productid,privilprice, amount, usecount,status,createtime,expiretime,app) 
+		values ( #{userid,jdbcType=VARCHAR}
+				,#{productid,jdbcType=INTEGER}
+				,#{privilprice,jdbcType=FLOAT}
+				,#{amount,jdbcType=INTEGER}
+				,#{usecount,jdbcType=INTEGER}
+				,#{status,jdbcType=INTEGER}
+				,#{createtime,jdbcType=VARCHAR}
+				,#{expiretime,jdbcType=VARCHAR}
+				,#{app,jdbcType=INTEGER}
+				)
+	</insert>
+	
+	<update id="usePrivilege" parameterType="com.huoli.bmall.points.model.Privilege" flushCache="true">
+		update privilege set status = #{status},usetime=now(),usecount=#{usecount} where privilid = #{privilid} and userid = #{userid}
+	</update>
+</mapper>
