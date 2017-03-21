@@ -22,5 +22,26 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/repository/jfree/jcommon/1.0.15/jcommon-1.0.15.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="jfree"/>
+			<attribute name="maven.artifactId" value="jcommon"/>
+			<attribute name="maven.version" value="1.0.15"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/repository/io/netty/netty-all/4.0.25.Final/netty-all-4.0.25.Final.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+			<attribute name="maven.artifactId" value="netty-all"/>
+			<attribute name="maven.version" value="4.0.25.Final"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="src/main/jna-3.0.9-sources.jar"/>
+	<classpathentry kind="lib" path="src/main/JNative.jar"/>
+	<classpathentry kind="lib" path="src/main/jna-3.0.9.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
